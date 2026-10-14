@@ -50,6 +50,12 @@ def load_font(px):
 TEXT = ""                                          # set in main(), read by load_font()
 
 
+def has_emoji(text):
+    """Emoji have no glyphs in the fonts used, so they would print as empty boxes."""
+    return any(0x1F000 <= ord(c) <= 0x1FAFF or ord(c) in (0x200D, 0xFE0F, 0x2B50, 0x2B55)
+               for c in text)
+
+
 def colour(name, opacity):
     rgb = {"white": (255, 255, 255), "black": (0, 0, 0), "red": (220, 30, 30)}[name]
     return rgb + (round(255 * opacity),)
@@ -180,7 +186,7 @@ def main(argv=None):
         description="Add a text watermark to JPEG photos. Originals are never changed.",
         formatter_class=argparse.RawDescriptionHelpFormatter, epilog=__doc__.split("Examples", 1)[1])
     ap.add_argument("inputs", nargs="+", help="photos or folders of photos")
-    ap.add_argument("-t", "--text", required=True, help="watermark text (required)")
+    ap.add_argument("-t", "--text", required=True, help="watermark text (required; text only, no emoji)")
     ap.add_argument("-s", "--style", choices=STYLES, default="tiled", help="default: tiled")
     ap.add_argument("-d", "--density", type=int, default=6,
                     help="tiled only: number of lines of text across the photo, 1–30 (default 6)")
@@ -197,6 +203,10 @@ def main(argv=None):
     ap.add_argument("--quality", type=int, default=92, help="JPEG quality, default 92")
     a = ap.parse_args(argv)
 
+    if not a.text.strip():
+        ap.error("--text is empty")
+    if has_emoji(a.text):
+        ap.error("--text cannot contain emoji; they would print as empty boxes. Use letters and numbers")
     size, opacity = STYLE_DEFAULTS[a.style]
     a.size = a.size or size
     a.opacity = min(1.0, max(0.05, a.opacity if a.opacity is not None else opacity))

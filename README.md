@@ -7,11 +7,11 @@ Adds a text watermark to JPEG (and PNG) photos. Originals are never changed.
 Built for marking photos and ID scans before uploading them somewhere — a
 repeated diagonal watermark is hard to crop or edit out.
 
+- **Text only** — any language, but no emoji and no logo images
 - Four styles: **tiled** diagonal lines (default), **centre**, **corner**, **banner**
 - Batch: pass a folder and every JPEG/PNG in it is processed
 - Optional resize: width, height, or both
 - Removes location and camera data, keeps the colour profile, fixes phone rotation
-- Handles Japanese, Chinese and other non-Latin text
 
 ![The four styles: tiled, centre, corner and banner](docs/styles.jpg)
 
@@ -95,7 +95,7 @@ Folders are read one level deep (not subfolders). Other files are skipped.
 
 | Option | What it does | Default |
 |---|---|---|
-| `-t, --text` | The watermark text. **Required.** | — |
+| `-t, --text` | The watermark text. **Required.** Text only — emoji are refused, as they would print as empty boxes | — |
 | `-s, --style` | `tiled`, `centre`, `corner`, `banner` | `tiled` |
 | `-d, --density` | Tiled only: **number of lines of text** across the photo, 1–30 | `6` |
 | `-o, --opacity` | 0.05–1.0 | tiled 0.28, centre 0.35, corner 0.8, banner 0.9 |

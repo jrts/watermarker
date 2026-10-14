@@ -159,6 +159,8 @@ def test_non_latin_text_and_tiny_images(tmp_path):
     ["-t", "X", "-d", "31"],
     ["-t", "X", "-W", "0"],
     ["-t", "X", "-s", "spiral"],
+    ["-t", "FOR AIRBNB 🏠"],        # emoji
+    ["-t", "   "],                  # blank
 ])
 def test_bad_options_are_refused(tmp_path, args):
     src = photo(tmp_path / "p.jpg")
