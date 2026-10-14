@@ -1,5 +1,7 @@
 # watermarker
 
+[![tests](https://github.com/jrts/watermarker/actions/workflows/test.yml/badge.svg)](https://github.com/jrts/watermarker/actions/workflows/test.yml)
+
 Adds a text watermark to JPEG (and PNG) photos. Originals are never changed.
 
 Built for marking photos and ID scans before uploading them somewhere — a
@@ -8,7 +10,7 @@ repeated diagonal watermark is hard to crop or edit out.
 - Four styles: **tiled** diagonal lines (default), **centre**, **corner**, **banner**
 - Batch: pass a folder and every JPEG/PNG in it is processed
 - Optional resize: width, height, or both
-- Strips metadata (GPS, camera details) and fixes phone rotation
+- Removes location and camera data, keeps the colour profile, fixes phone rotation
 - Handles Japanese, Chinese and other non-Latin text
 
 ![The four styles: tiled, centre, corner and banner](docs/styles.jpg)
@@ -118,8 +120,12 @@ watermark goes on, so the text is sized for the final image.
 **White on white:** the default text is white, which disappears on white
 paper. Use `--color black` for scans of documents.
 
-**Privacy:** output files carry no metadata — GPS location and camera details
-are stripped. Phone photos are rotated the right way up first.
+**Privacy:** location is removed. Each output is a fresh image, so nothing
+from the original's metadata comes across — no EXIF (GPS, camera make and
+model, date taken), no XMP, no comments. The one thing kept is the **colour
+profile**, which holds no personal data and stops iPhone photos looking dull.
+Phone photos are turned the right way up before the metadata is dropped.
+The tests check this on every change.
 
 ## Examples
 
@@ -133,6 +139,19 @@ python watermark.py ~/Pictures/flat/ -t "MY FLAT" -s corner -W 1600
 # Exactly 1080 x 1080 (stretched)
 python watermark.py photo.jpg -t "FOR AIRBNB ONLY" -W 1080 -H 1080
 ```
+
+## Tests
+
+```sh
+pip install -r requirements-dev.txt
+python -m pytest
+```
+
+The tests make their own images, so they need no sample photos. They cover
+every style, the line count for `--density`, all resize modes, phone
+rotation, removal of GPS/EXIF/XMP, the colour profile, transparent PNGs,
+folders, and bad options. GitHub Actions runs them on macOS, Linux and
+Windows, with Python 3.9 and 3.13, on every push.
 
 ## Licence
 

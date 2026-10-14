@@ -9,7 +9,8 @@ Examples
   python watermark.py photo.jpg --text "FOR AIRBNB ONLY" -W 1080 -H 1080       # both: stretched to exactly 1080x1080
 
 Originals are never touched. Output goes to a "watermarked" folder beside
-each input, with metadata (GPS, camera details) stripped.
+each input, with metadata (GPS, camera details) stripped and the colour
+profile kept.
 """
 import argparse
 import math
@@ -146,6 +147,7 @@ def resize(im, width, height):
 
 def watermark(src, dest, a):
     with Image.open(src) as im:
+        icc = im.info.get("icc_profile")          # colour profile: no personal data, keeps colours true
         im = ImageOps.exif_transpose(im)          # respect phone rotation
         if im.mode in ("RGBA", "LA") or "transparency" in im.info:
             flat = Image.new("RGBA", im.size, (255, 255, 255, 255))   # see-through parts become white
@@ -153,7 +155,9 @@ def watermark(src, dest, a):
         base = resize(im, a.width, a.height).convert("RGBA")   # resize first, so the text scales to the final size
     out = Image.alpha_composite(base, STYLES[a.style](base, a)).convert("RGB")
     dest.parent.mkdir(parents=True, exist_ok=True)
-    out.save(dest, "JPEG", quality=a.quality, optimize=True)   # no EXIF: GPS stripped
+    # A fresh image carries no EXIF, XMP or comments, so GPS and camera details are dropped.
+    extra = {"icc_profile": icc} if icc else {}
+    out.save(dest, "JPEG", quality=a.quality, optimize=True, **extra)
 
 
 def collect(paths):
@@ -169,7 +173,9 @@ def collect(paths):
     return files
 
 
-def main():
+def main(argv=None):
+    for stream in (sys.stdout, sys.stderr):      # Windows consoles may not print ✓
+        stream.reconfigure(errors="replace")
     ap = argparse.ArgumentParser(
         description="Add a text watermark to JPEG photos. Originals are never changed.",
         formatter_class=argparse.RawDescriptionHelpFormatter, epilog=__doc__.split("Examples", 1)[1])
@@ -189,7 +195,7 @@ def main():
     ap.add_argument("--out", help="output folder (default: a 'watermarked' folder beside each photo)")
     ap.add_argument("--suffix", default="_wm", help="added to each filename, default _wm")
     ap.add_argument("--quality", type=int, default=92, help="JPEG quality, default 92")
-    a = ap.parse_args()
+    a = ap.parse_args(argv)
 
     size, opacity = STYLE_DEFAULTS[a.style]
     a.size = a.size or size
@@ -208,6 +214,7 @@ def main():
     files = collect(a.inputs)
     if not files:
         sys.exit("No JPEG or PNG files found.")
+    failed = 0
     for src in files:
         folder = Path(a.out).expanduser() if a.out else src.parent / "watermarked"
         dest = folder / f"{src.stem}{a.suffix}.jpg"
@@ -215,8 +222,10 @@ def main():
             watermark(src, dest, a)
             print(f"✓ {dest}")
         except Exception as e:                    # keep going on a bad file
+            failed += 1
             print(f"✗ {src}: {e}", file=sys.stderr)
+    return 1 if failed else 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
