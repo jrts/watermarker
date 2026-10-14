@@ -11,6 +11,8 @@ repeated diagonal watermark is hard to crop or edit out.
 - Strips metadata (GPS, camera details) and fixes phone rotation
 - Handles Japanese, Chinese and other non-Latin text
 
+![The four styles: tiled, centre, corner and banner](docs/styles.jpg)
+
 ## Install
 
 You need **Python 3.9 or newer** and one library, **[Pillow](https://python-pillow.org/)**.
@@ -104,6 +106,10 @@ Folders are read one level deep (not subfolders). Other files are skipped.
 | `--suffix` | Added to the filename | `_wm` |
 | `--quality` | JPEG quality | 92 |
 
+**Density** is the number of lines of text across the photo, for the tiled style:
+
+![Tiled style with 3, 6, 10 and 15 lines of text](docs/density.jpg)
+
 **Resizing:** give neither and the size is unchanged. Give one of `--width` or
 `--height` and the other follows the photo's proportions. Give both and the
 photo is stretched to exactly that size. Resizing happens before the
@@ -127,3 +133,13 @@ python watermark.py ~/Pictures/flat/ -t "MY FLAT" -s corner -W 1600
 # Exactly 1080 x 1080 (stretched)
 python watermark.py photo.jpg -t "FOR AIRBNB ONLY" -W 1080 -H 1080
 ```
+
+## Licence
+
+The code is MIT — see [LICENSE](LICENSE).
+
+The example images in `docs/` are made with this tool from
+[Himeji castle in may 2015](https://commons.wikimedia.org/wiki/File:Himeji_castle_in_may_2015.jpg)
+by Nikos Kitsakis, licensed
+[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). They were
+resized and watermarked, and are shared under the same licence.
