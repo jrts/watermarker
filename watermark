@@ -1,4 +1,0 @@
-#!/bin/sh
-# Runs watermark.py with its own Python environment (Pillow installed there).
-DIR="$(cd "$(dirname "$0")" && pwd)"
-exec "$DIR/.venv/bin/python" "$DIR/watermark.py" "$@"

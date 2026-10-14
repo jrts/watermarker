@@ -13,26 +13,75 @@ repeated diagonal watermark is hard to crop or edit out.
 
 ## Install
 
-Needs Python 3.9+.
+You need **Python 3.9 or newer** and one library, **[Pillow](https://python-pillow.org/)**.
+Check your Python with `python3 --version`.
+
+### 1. Get the code
 
 ```sh
 git clone https://github.com/jrts/watermarker.git
 cd watermarker
-./setup.sh
 ```
 
-`setup.sh` creates a private Python environment in `.venv` with
-[Pillow](https://python-pillow.org/), so nothing is installed system-wide.
-The `watermark` command runs the script inside it.
+### 2. Install Pillow
 
-Prefer your own environment? `pip install -r requirements.txt`, then run
-`python3 watermark.py` instead of `./watermark`.
+**Recommended: a virtual environment**, so Pillow stays inside this folder and
+nothing is installed system-wide.
+
+macOS / Linux:
+
+```sh
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+Windows (PowerShell):
+
+```powershell
+py -m venv .venv
+.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+```
+
+Each time you open a new terminal, activate it again with
+`source .venv/bin/activate` (or `.venv\Scripts\Activate.ps1` on Windows).
+`deactivate` leaves it.
+
+**Or without a virtual environment:**
+
+```sh
+python3 -m pip install --user "pillow>=10.1"
+```
+
+On recent macOS and Linux this may refuse with *externally-managed-environment*
+— use the virtual environment instead.
+
+### 3. Check it works
+
+```sh
+python watermark.py --help
+```
+
+If you see `Pillow is missing`, the environment is not active, or step 2 did
+not run.
+
+### Optional: run it from anywhere
+
+Add an alias to `~/.zshrc` or `~/.bashrc`, pointing at your copy:
+
+```sh
+alias watermark='/path/to/watermarker/.venv/bin/python /path/to/watermarker/watermark.py'
+```
+
+Then `watermark photo.jpg -t "FOR AIRBNB ONLY"` works in any folder, without
+activating anything.
 
 ## Run it
 
 ```sh
-./watermark photo.jpg --text "FOR AIRBNB ONLY"
-./watermark ~/Pictures/airbnb/ --text "FOR AIRBNB ONLY"      # a whole folder
+python watermark.py photo.jpg --text "FOR AIRBNB ONLY"
+python watermark.py ~/Pictures/airbnb/ --text "FOR AIRBNB ONLY"      # a whole folder
 ```
 
 Output goes to a `watermarked/` folder beside each photo, named `<name>_wm.jpg`.
@@ -70,11 +119,11 @@ are stripped. Phone photos are rotated the right way up first.
 
 ```sh
 # A passport photo, 10 lines of text, dated
-./watermark ~/Desktop/passport.jpg -t "FOR AIRBNB ONLY 14 OCT 2026" -d 10
+python watermark.py ~/Desktop/passport.jpg -t "FOR AIRBNB ONLY 14 OCT 2026" -d 10
 
 # A whole folder, corner stamp, 1600 px wide
-./watermark ~/Pictures/flat/ -t "MY FLAT" -s corner -W 1600
+python watermark.py ~/Pictures/flat/ -t "MY FLAT" -s corner -W 1600
 
 # Exactly 1080 x 1080 (stretched)
-./watermark photo.jpg -t "FOR AIRBNB ONLY" -W 1080 -H 1080
+python watermark.py photo.jpg -t "FOR AIRBNB ONLY" -W 1080 -H 1080
 ```

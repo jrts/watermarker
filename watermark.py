@@ -2,11 +2,11 @@
 """Add a text watermark to JPEG photos.
 
 Examples
-  watermark photo.jpg --text "FOR AIRBNB ONLY"
-  watermark ~/Desktop/passport.jpg --text "FOR AIRBNB ONLY 14 OCT 2026" --density 10
-  watermark ~/Pictures/flat/ --text "MY FLAT" --style corner
-  watermark photo.jpg --text "FOR AIRBNB ONLY" --width 1600          # height keeps the ratio
-  watermark photo.jpg --text "FOR AIRBNB ONLY" -W 1080 -H 1080       # both: stretched to exactly 1080x1080
+  python watermark.py photo.jpg --text "FOR AIRBNB ONLY"
+  python watermark.py ~/Desktop/passport.jpg --text "FOR AIRBNB ONLY 14 OCT 2026" --density 10
+  python watermark.py ~/Pictures/flat/ --text "MY FLAT" --style corner
+  python watermark.py photo.jpg --text "FOR AIRBNB ONLY" --width 1600          # height keeps the ratio
+  python watermark.py photo.jpg --text "FOR AIRBNB ONLY" -W 1080 -H 1080       # both: stretched to exactly 1080x1080
 
 Originals are never touched. Output goes to a "watermarked" folder beside
 each input, with metadata (GPS, camera details) stripped.
@@ -19,7 +19,8 @@ from pathlib import Path
 try:
     from PIL import Image, ImageDraw, ImageFont, ImageOps
 except ImportError:
-    sys.exit("Pillow is missing. Run:  python3 -m pip install pillow")
+    sys.exit("Pillow is missing. Activate the virtual environment (source .venv/bin/activate),\n"
+             "or see Install in README.md.")
 
 EXTENSIONS = {".jpg", ".jpeg", ".png"}
 # Japanese, Chinese and other non-Latin text needs a font that has those characters.
